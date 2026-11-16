@@ -93,7 +93,7 @@ if(w.chaport)return;v3=w.chaport={};v3._q=[];v3._l={};v3.q=function(){v3._q.push
       <nav class="hidden md:flex items-center gap-5 text-sm font-medium">
         <span class="text-white border-b-2 border-[#0C6CF2] py-1">Portfolio</span>
         <span onclick="openRestrictedAction('Prices')" class="text-[var(--muted)] hover:text-white cursor-pointer">Prices</span>
-        <span onclick="openRestrictedAction('Transfers')" class="text-[var(--muted)] hover:text-white cursor-pointer">Transfers</span>
+        <span onclick="openTransferModal()" class="text-[var(--muted)] hover:text-white cursor-pointer">Transfers</span>
       </nav>
     </div>
 
@@ -133,11 +133,11 @@ if(w.chaport)return;v3=w.chaport={};v3._q=[];v3._l={};v3.q=function(){v3._q.push
 
       <!-- Action Buttons -->
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mt-6 pt-5 border-t" style="border-color:var(--border)">
-        <button onclick="openRestrictedAction('Withdraw')" class="btn btn-primary py-2.5 text-sm flex items-center justify-center gap-1.5"><span>↗</span> Withdraw</button>
-        <button onclick="openRestrictedAction('Send')" class="btn btn-ghost py-2.5 text-sm flex items-center justify-center gap-1.5"><span>⇄</span> Send</button>
+        <button onclick="openTransferModal()" class="btn btn-primary py-2.5 text-sm flex items-center justify-center gap-1.5"><span>↗</span> Withdraw</button>
+        <button onclick="openTransferModal()" class="btn btn-ghost py-2.5 text-sm flex items-center justify-center gap-1.5"><span>⇄</span> Send</button>
         <button onclick="openRestrictedAction('Buy')" class="btn btn-ghost py-2.5 text-sm flex items-center justify-center gap-1.5"><span>＋</span> Buy</button>
         <button onclick="openRestrictedAction('Sell')" class="btn btn-ghost py-2.5 text-sm flex items-center justify-center gap-1.5"><span>−</span> Sell</button>
-        <button onclick="openRestrictedAction('Receive')" class="btn btn-ghost py-2.5 text-sm col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5"><span>⇣</span> Receive</button>
+        <button onclick="openReceiveModal()" class="btn btn-ghost py-2.5 text-sm col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5"><span>⇣</span> Receive</button>
       </div>
     </div>
 
@@ -151,6 +151,69 @@ if(w.chaport)return;v3=w.chaport={};v3._q=[];v3._l={};v3.q=function(){v3._q.push
     </div>
   </main>
 </section>
+
+<!-- ===================== TRUST WALLET STYLE TRANSFER / WITHDRAWAL MODAL ===================== -->
+<div id="modal-transfer" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+  <div class="card w-full max-w-md p-6 space-y-4 bg-[#0B0E14] border border-[var(--border)] rounded-2xl shadow-2xl">
+    <div class="flex items-center justify-between">
+      <h3 class="font-bold text-base text-white">Send / Withdraw Crypto</h3>
+      <button onclick="closeModal('modal-transfer')" class="text-[var(--muted)] hover:text-white text-sm font-bold">✕</button>
+    </div>
+
+    <form onsubmit="handleTransferSubmit(event)" class="space-y-3.5">
+      <div>
+        <label class="text-[10px] font-semibold text-[var(--muted)] uppercase block mb-1">Select Asset</label>
+        <select id="transfer-coin" class="input w-full px-3 py-2 text-xs bg-[#12161F] text-white border border-[var(--border)] rounded-lg">
+          <option value="BTC">Bitcoin (BTC)</option>
+          <option value="ETH">Ethereum (ETH)</option>
+          <option value="BNB">Binance Coin (BNB)</option>
+          <option value="USDT">Tether USD (USDT)</option>
+          <option value="SOL">Solana (SOL)</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-[10px] font-semibold text-[var(--muted)] uppercase block mb-1">Recipient Wallet Address</label>
+        <input type="text" id="transfer-address" placeholder="Paste destination address (e.g., bc1q...)" required class="input w-full px-3 py-2 text-xs bg-[#12161F] text-white border border-[var(--border)] rounded-lg font-mono">
+      </div>
+
+      <div>
+        <label class="text-[10px] font-semibold text-[var(--muted)] uppercase block mb-1">Amount</label>
+        <input type="number" step="any" id="transfer-amount" placeholder="0.00" required class="input w-full px-3 py-2 text-xs bg-[#12161F] text-white border border-[var(--border)] rounded-lg font-mono">
+      </div>
+
+      <div class="pt-2">
+        <button type="submit" class="btn btn-primary w-full py-2.5 text-sm font-bold rounded-xl shadow-lg bg-blue-600 hover:bg-blue-500 text-white">
+          Continue Transfer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== RECEIVE BITCOIN MODAL ===================== -->
+<div id="modal-receive" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+  <div class="card modal-pop w-full max-w-md p-6 space-y-4 bg-[#0B0E14] border border-[var(--border)] rounded-2xl shadow-2xl text-center">
+    <div class="flex items-center justify-between">
+      <h3 class="font-bold text-base text-white">Receive Bitcoin (BTC)</h3>
+      <button onclick="closeModal('modal-receive')" class="text-[var(--muted)] hover:text-white text-sm font-bold">✕</button>
+    </div>
+
+    <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-3">
+      <p class="text-xs text-[var(--muted)]">Send only <span class="text-white font-semibold">Bitcoin (BTC)</span> to this deposit address.</p>
+      
+      <div class="flex items-center justify-between gap-2 p-3 rounded-lg bg-[#0B0E14] border border-[var(--border)]">
+        <span id="receive-btc-address" class="mono text-xs text-white break-all text-left select-all">bc1qz4sjkd58wsp003xzmatg0e8kw5yu24dth7cqah</span>
+      </div>
+
+      <button onclick="copyReceiveAddress()" id="btn-copy-btc" class="btn btn-primary w-full py-2.5 text-sm font-bold flex items-center justify-center gap-2">
+        <span>📋</span> Copy Address
+      </button>
+    </div>
+
+    <p class="text-[11px] text-[var(--muted)]">Deposits will automatically reflect in your portfolio after network confirmations.</p>
+  </div>
+</div>
 
 <!-- ===================== UNIVERSAL ERROR MODAL ===================== -->
 <div id="modal-error" class="fixed inset-0 overlay hidden items-center justify-center p-4 z-50">
